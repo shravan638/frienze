@@ -419,11 +419,12 @@
 <div class="app">
   <header>
     <div class="logo">Fri<span>enze</span></div>
-    <nav>
-      <button class="nav-btn" onclick="showPage('dashboard')">Dashboard</button>
-      <button class="nav-btn" onclick="showPage('settings')">Settings</button>
-      <button class="nav-btn primary" id="authBtn" onclick="showAuthModal()">Sign In</button>
-    </nav>
+<nav>
+  <button class="nav-btn" onclick="showPage('dashboard')">Dashboard</button>
+  <button class="nav-btn" onclick="showPage('settings')">Settings</button>
+  <button class="nav-btn" onclick="showSubscription()">Subscribe</button>
+  <button class="nav-btn primary" id="authBtn" onclick="showAuthModal()">Sign In</button>
+</nav>
   </header>
 
   <!-- ── HOME PAGE ──────────────────────────────────── -->
@@ -743,7 +744,9 @@ function showPage(page) {
 function showAuthModal() {
   toast('Auth system — connect your backend');
 }
-
+function showSubscription() {
+  toast("Subscription system coming soon 💳");
+}
 // ── Init ───────────────────────────────────────────────
 connectWS();
 updatePersonalityUI('friend');

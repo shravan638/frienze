@@ -738,7 +738,6 @@ function showBubble(id, text) {
   const el = document.getElementById(id);
   el.textContent = text;
   el.classList.add('visible');
-  setTimeout(() => el.classList.remove('visible'), 8000);
 }
 
 function toast(msg, type = 'info') {

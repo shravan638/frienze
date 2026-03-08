@@ -8,42 +8,90 @@
 <style>
 
 body{
+margin:0;
 font-family:Arial,Helvetica,sans-serif;
-background:#0e0e16;
+background:#0f0f18;
 color:white;
 display:flex;
-flex-direction:column;
-align-items:center;
 height:100vh;
-margin:0;
+overflow:hidden;
 }
 
-header{
-font-size:24px;
-margin:20px;
+/* SIDEBAR */
+
+.sidebar{
+width:260px;
+background:#141421;
+border-right:1px solid #222;
+display:flex;
+flex-direction:column;
+}
+
+.sidebar-header{
+padding:18px;
+font-size:18px;
 font-weight:bold;
 color:#c8a96e;
+border-bottom:1px solid #222;
 }
 
-.chat-container{
-width:90%;
-max-width:700px;
-height:420px;
+.new-chat{
+margin:15px;
+padding:10px;
+background:#1f1f2e;
+border:none;
+border-radius:6px;
+color:white;
+cursor:pointer;
+}
+
+.history{
+flex:1;
 overflow-y:auto;
+padding:10px;
+}
+
+.history-item{
+padding:10px;
+border-radius:6px;
+cursor:pointer;
+margin-bottom:6px;
+background:#1a1a28;
+font-size:14px;
+}
+
+.history-item:hover{
+background:#26263a;
+}
+
+/* MAIN AREA */
+
+.main{
+flex:1;
+display:flex;
+flex-direction:column;
+}
+
+.header{
+padding:16px;
+border-bottom:1px solid #222;
+font-size:18px;
+}
+
+.chat{
+flex:1;
+overflow-y:auto;
+padding:25px;
 display:flex;
 flex-direction:column;
 gap:12px;
-padding:20px;
-background:#141420;
-border-radius:12px;
-border:1px solid rgba(200,169,110,0.2);
 }
 
 .message{
+max-width:65%;
 padding:12px 16px;
 border-radius:12px;
-max-width:70%;
-font-size:15px;
+font-size:14px;
 line-height:1.4;
 }
 
@@ -54,16 +102,17 @@ align-self:flex-end;
 
 .ai{
 background:#2a2a3d;
-align-self:flex-start;
 border:1px solid rgba(200,169,110,0.2);
+align-self:flex-start;
 }
 
+/* INPUT */
+
 .input-area{
-width:90%;
-max-width:700px;
 display:flex;
 gap:10px;
-margin-top:15px;
+padding:15px;
+border-top:1px solid #222;
 }
 
 #textInput{
@@ -73,17 +122,15 @@ border-radius:8px;
 border:1px solid #333;
 background:#1a1a26;
 color:white;
-font-size:15px;
 }
 
 button{
 background:#1f1f2e;
-color:white;
 border:none;
 padding:10px 14px;
 border-radius:8px;
+color:white;
 cursor:pointer;
-font-size:16px;
 }
 
 button:hover{
@@ -91,9 +138,10 @@ background:#2a2a3d;
 }
 
 .status{
-margin-top:10px;
-font-size:13px;
+font-size:12px;
 color:#aaa;
+padding-left:15px;
+padding-bottom:10px;
 }
 
 </style>
@@ -101,9 +149,31 @@ color:#aaa;
 
 <body>
 
-<header>Frienze AI</header>
+<!-- SIDEBAR -->
 
-<div class="chat-container" id="chatContainer"></div>
+<div class="sidebar">
+
+<div class="sidebar-header">
+Frienze AI
+</div>
+
+<button class="new-chat" onclick="newChat()">
++ New Chat
+</button>
+
+<div class="history" id="historyList"></div>
+
+</div>
+
+<!-- MAIN -->
+
+<div class="main">
+
+<div class="header">
+Your AI Companion
+</div>
+
+<div class="chat" id="chat"></div>
 
 <div class="input-area">
 
@@ -111,8 +181,7 @@ color:#aaa;
 
 <input
 id="textInput"
-type="text"
-placeholder="Type a message to Frienze..."
+placeholder="Message Frienze..."
 onkeydown="if(event.key==='Enter') sendText()"
 />
 
@@ -120,8 +189,10 @@ onkeydown="if(event.key==='Enter') sendText()"
 
 </div>
 
-<div class="status" id="statusMsg">
-Frienze is ready.
+<div class="status" id="status">
+Ready
+</div>
+
 </div>
 
 <script>
@@ -129,13 +200,61 @@ Frienze is ready.
 let recognition
 let listening=false
 
-function setStatus(text){
-document.getElementById("statusMsg").textContent=text
+let chats=JSON.parse(localStorage.getItem("frienzeChats")||"[]")
+let currentChat=[]
+
+const chatBox=document.getElementById("chat")
+
+function saveChats(){
+localStorage.setItem("frienzeChats",JSON.stringify(chats))
 }
 
-function addMessage(text,type){
+function newChat(){
 
-const chat=document.getElementById("chatContainer")
+if(currentChat.length>0){
+chats.push(currentChat)
+saveChats()
+}
+
+currentChat=[]
+chatBox.innerHTML=""
+renderHistory()
+
+}
+
+function renderHistory(){
+
+const history=document.getElementById("historyList")
+
+history.innerHTML=""
+
+chats.forEach((chat,index)=>{
+
+const item=document.createElement("div")
+
+item.className="history-item"
+
+item.textContent=chat[0]?.text.slice(0,30) || "Conversation"
+
+item.onclick=()=>loadChat(index)
+
+history.appendChild(item)
+
+})
+
+}
+
+function loadChat(i){
+
+currentChat=chats[i]
+
+chatBox.innerHTML=""
+
+currentChat.forEach(m=>addMessage(m.text,m.type,false))
+
+}
+
+function addMessage(text,type,save=true){
 
 const msg=document.createElement("div")
 
@@ -143,9 +262,13 @@ msg.className="message "+type
 
 msg.textContent=text
 
-chat.appendChild(msg)
+chatBox.appendChild(msg)
 
-chat.scrollTop=chat.scrollHeight
+chatBox.scrollTop=chatBox.scrollHeight
+
+if(save){
+currentChat.push({text,type})
+}
 
 }
 
@@ -153,30 +276,52 @@ function sendText(){
 
 const input=document.getElementById("textInput")
 
-const message=input.value.trim()
+const text=input.value.trim()
 
-if(!message) return
+if(!text) return
 
-addMessage(message,"user")
+addMessage(text,"user")
 
 input.value=""
 
-setStatus("Frienze is thinking...")
+reply(text)
+
+}
+
+function reply(userText){
+
+document.getElementById("status").textContent="Frienze thinking..."
 
 setTimeout(()=>{
 
-addMessage("Hi! I'm Frienze. Full AI replies will connect soon.","ai")
+let response="You said: "+userText
 
-setStatus("Frienze is ready")
+addMessage(response,"ai")
 
-},1000)
+speak(response)
+
+document.getElementById("status").textContent="Ready"
+
+},800)
+
+}
+
+function speak(text){
+
+const speech=new SpeechSynthesisUtterance(text)
+
+speech.lang="en-US"
+
+speech.rate=1
+
+speechSynthesis.speak(speech)
 
 }
 
 function toggleVoice(){
 
 if(!('webkitSpeechRecognition' in window)){
-alert("Speech recognition not supported in this browser")
+alert("Voice not supported")
 return
 }
 
@@ -184,39 +329,25 @@ if(!recognition){
 
 recognition=new webkitSpeechRecognition()
 
-recognition.continuous=false
-recognition.interimResults=false
 recognition.lang="en-US"
 
-recognition.onstart=function(){
+recognition.onstart=()=>{
 listening=true
-setStatus("Listening...")
+document.getElementById("status").textContent="Listening..."
 }
 
-recognition.onend=function(){
+recognition.onend=()=>{
 listening=false
-setStatus("Frienze is ready")
+document.getElementById("status").textContent="Ready"
 }
 
-recognition.onerror=function(e){
-setStatus("Voice error: "+e.error)
-}
+recognition.onresult=(e)=>{
 
-recognition.onresult=function(event){
-
-const text=event.results[0][0].transcript
+const text=e.results[0][0].transcript
 
 addMessage(text,"user")
 
-setStatus("Frienze thinking...")
-
-setTimeout(()=>{
-
-addMessage("I heard: "+text,"ai")
-
-setStatus("Frienze is ready")
-
-},1000)
+reply(text)
 
 }
 
@@ -229,6 +360,8 @@ recognition.stop()
 }
 
 }
+
+renderHistory()
 
 </script>
 

@@ -1,801 +1,237 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Frienze — Your Voice Companion</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Frienze AI</title>
+
 <style>
-  :root {
-    --bg: #0a0a0f;
-    --surface: #12121a;
-    --surface2: #1a1a26;
-    --border: rgba(255,255,255,0.07);
-    --text: #f0eee8;
-    --muted: rgba(240,238,232,0.4);
-    --accent: #c8a96e;
-    --glow: rgba(200,169,110,0.15);
 
-    --friend: #4ECDC4;
-    --mom: #FF6B9D;
-    --dad: #4A90D9;
-    --mentor: #F7B731;
-    --teacher: #A29BFE;
-  }
+body{
+font-family:Arial,Helvetica,sans-serif;
+background:#0e0e16;
+color:white;
+display:flex;
+flex-direction:column;
+align-items:center;
+height:100vh;
+margin:0;
+}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+header{
+font-size:24px;
+margin:20px;
+font-weight:bold;
+color:#c8a96e;
+}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+.chat-container{
+width:90%;
+max-width:700px;
+height:420px;
+overflow-y:auto;
+display:flex;
+flex-direction:column;
+gap:12px;
+padding:20px;
+background:#141420;
+border-radius:12px;
+border:1px solid rgba(200,169,110,0.2);
+}
 
-  /* ── Background Atmosphere ─────────────────────────── */
-  .bg-orb {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(100px);
-    pointer-events: none;
-    transition: background 2s ease, transform 2s ease;
-    z-index: 0;
-  }
-  .bg-orb-1 {
-    width: 600px; height: 600px;
-    top: -200px; left: -100px;
-    background: radial-gradient(circle, rgba(200,169,110,0.08) 0%, transparent 70%);
-  }
-  .bg-orb-2 {
-    width: 500px; height: 500px;
-    bottom: -100px; right: -100px;
-    background: radial-gradient(circle, rgba(78,205,196,0.06) 0%, transparent 70%);
-    transition: background 2s ease;
-  }
+.message{
+padding:12px 16px;
+border-radius:12px;
+max-width:70%;
+font-size:15px;
+line-height:1.4;
+}
 
-  /* ── Layout ───────────────────────────────────────── */
-  .app {
-    position: relative;
-    z-index: 1;
-    min-height: 100vh;
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-  }
+.user{
+background:#1f1f2e;
+align-self:flex-end;
+}
 
-  /* ── Header ───────────────────────────────────────── */
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 28px 48px;
-    border-bottom: 1px solid var(--border);
-    backdrop-filter: blur(20px);
-  }
+.ai{
+background:#2a2a3d;
+align-self:flex-start;
+border:1px solid rgba(200,169,110,0.2);
+}
 
-  .logo {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.8rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--accent);
-  }
-  .logo span {
-    font-style: italic;
-    font-weight: 400;
-    color: var(--text);
-  }
+.input-area{
+width:90%;
+max-width:700px;
+display:flex;
+gap:10px;
+margin-top:15px;
+}
 
-  nav { display: flex; gap: 8px; align-items: center; }
-  .nav-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    padding: 8px 18px;
-    border-radius: 100px;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem;
-    transition: all 0.2s;
-  }
-  .nav-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
-  .nav-btn.primary {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #0a0a0f;
-    font-weight: 500;
-  }
-  .nav-btn.primary:hover { background: #d4b87e; }
+#textInput{
+flex:1;
+padding:12px;
+border-radius:8px;
+border:1px solid #333;
+background:#1a1a26;
+color:white;
+font-size:15px;
+}
 
-  /* ── Main Content ─────────────────────────────────── */
-  main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 24px;
-    gap: 48px;
-  }
+button{
+background:#1f1f2e;
+color:white;
+border:none;
+padding:10px 14px;
+border-radius:8px;
+cursor:pointer;
+font-size:16px;
+}
 
-  /* ── Personality Indicator ────────────────────────── */
-  .personality-indicator {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    animation: fadeIn 0.6s ease;
-  }
+button:hover{
+background:#2a2a3d;
+}
 
-  .personality-badge {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 24px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 100px;
-    font-size: 0.9rem;
-    letter-spacing: 0.03em;
-    transition: all 0.4s ease;
-  }
+.status{
+margin-top:10px;
+font-size:13px;
+color:#aaa;
+}
 
-  .personality-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--friend);
-    transition: background 0.4s ease;
-    box-shadow: 0 0 8px currentColor;
-  }
-
-  .personality-label {
-    font-weight: 500;
-    transition: color 0.4s ease;
-  }
-
-  .personality-subtitle {
-    font-size: 0.8rem;
-    color: var(--muted);
-    text-align: center;
-  }
-
-  /* ── Voice Orb ────────────────────────────────────── */
-  .voice-container {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .voice-rings {
-    position: absolute;
-    width: 220px; height: 220px;
-    border-radius: 50%;
-  }
-  .voice-rings::before,
-  .voice-rings::after {
-    content: '';
-    position: absolute;
-    inset: -20px;
-    border-radius: 50%;
-    border: 1px solid rgba(200,169,110,0.15);
-    animation: ring-pulse 3s ease-in-out infinite;
-  }
-  .voice-rings::after {
-    inset: -40px;
-    animation-delay: 1s;
-    border-color: rgba(200,169,110,0.08);
-  }
-
-  @keyframes ring-pulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.05); opacity: 0.5; }
-  }
-
-  .voice-orb {
-    width: 180px; height: 180px;
-    border-radius: 50%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    user-select: none;
-  }
-
-  .voice-orb::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 50% 40%, rgba(200,169,110,0.12), transparent 60%);
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-
-  .voice-orb:hover::before { opacity: 1; }
-  .voice-orb:hover { border-color: rgba(200,169,110,0.3); transform: scale(1.02); }
-
-  .voice-orb.recording {
-    animation: orb-glow 1.5s ease-in-out infinite;
-    border-color: var(--accent);
-  }
-
-  @keyframes orb-glow {
-    0%, 100% { box-shadow: 0 0 20px rgba(200,169,110,0.2), inset 0 0 20px rgba(200,169,110,0.05); }
-    50% { box-shadow: 0 0 50px rgba(200,169,110,0.4), inset 0 0 30px rgba(200,169,110,0.1); }
-  }
-
-  .voice-orb.processing {
-    animation: orb-process 2s linear infinite;
-    border-color: rgba(162,155,254,0.6);
-  }
-
-  @keyframes orb-process {
-    0% { box-shadow: 0 0 20px rgba(162,155,254,0.2); }
-    50% { box-shadow: 0 0 40px rgba(162,155,254,0.5); }
-    100% { box-shadow: 0 0 20px rgba(162,155,254,0.2); }
-  }
-
-  .voice-orb.speaking {
-    animation: orb-speak 0.6s ease-in-out infinite alternate;
-  }
-
-  @keyframes orb-speak {
-    from { transform: scale(1); }
-    to { transform: scale(1.04); }
-  }
-
-  .orb-icon {
-    font-size: 2.4rem;
-    transition: all 0.3s ease;
-  }
-
-  .orb-text {
-    font-size: 0.78rem;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-weight: 500;
-  }
-
-  /* Waveform bars (shown during recording) */
-  .waveform {
-    display: none;
-    align-items: center;
-    gap: 3px;
-    height: 32px;
-  }
-  .waveform.active { display: flex; }
-
-  .wave-bar {
-    width: 3px;
-    border-radius: 2px;
-    background: var(--accent);
-    animation: wave 1.2s ease-in-out infinite;
-  }
-  .wave-bar:nth-child(1) { height: 8px; animation-delay: 0s; }
-  .wave-bar:nth-child(2) { height: 20px; animation-delay: 0.15s; }
-  .wave-bar:nth-child(3) { height: 32px; animation-delay: 0.3s; }
-  .wave-bar:nth-child(4) { height: 20px; animation-delay: 0.45s; }
-  .wave-bar:nth-child(5) { height: 12px; animation-delay: 0.6s; }
-
-  @keyframes wave {
-    0%, 100% { transform: scaleY(0.5); }
-    50% { transform: scaleY(1); }
-  }
-
-  /* ── Status Message ───────────────────────────────── */
-  .status-area {
-    min-height: 80px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-    max-width: 500px;
-  }
-
-  .status-message {
-    font-size: 0.9rem;
-    color: var(--muted);
-    text-align: center;
-    transition: all 0.3s;
-    font-style: italic;
-  }
-
-  .transcript-bubble {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    border-bottom-left-radius: 4px;
-    padding: 14px 20px;
-    font-size: 0.95rem;
-    width: 100%;
-    color: var(--text);
-    line-height: 1.6;
-    opacity: 0;
-    transform: translateY(8px);
-    transition: all 0.3s ease;
-  }
-  .transcript-bubble.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .ai-bubble {
-    border-radius: 16px;
-    border-bottom-right-radius: 4px;
-    border-color: rgba(200,169,110,0.2);
-    background: linear-gradient(135deg, rgba(200,169,110,0.08), transparent);
-    color: var(--text);
-  }
-
-  /* ── Personality Selector ─────────────────────────── */
-  .personality-selector {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .p-chip {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 100px;
-    cursor: pointer;
-    font-size: 0.82rem;
-    color: var(--muted);
-    transition: all 0.2s;
-    font-family: 'DM Sans', sans-serif;
-  }
-
-  .p-chip:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
-  .p-chip.active { color: var(--text); font-weight: 500; }
-  .p-chip[data-p="friend"].active { border-color: var(--friend); color: var(--friend); background: rgba(78,205,196,0.08); }
-  .p-chip[data-p="mom"].active    { border-color: var(--mom); color: var(--mom); background: rgba(255,107,157,0.08); }
-  .p-chip[data-p="dad"].active    { border-color: var(--dad); color: var(--dad); background: rgba(74,144,217,0.08); }
-  .p-chip[data-p="mentor"].active { border-color: var(--mentor); color: var(--mentor); background: rgba(247,183,49,0.08); }
-  .p-chip[data-p="teacher"].active{ border-color: var(--teacher); color: var(--teacher); background: rgba(162,155,254,0.08); }
-
-  /* ── Footer ───────────────────────────────────────── */
-  footer {
-    text-align: center;
-    padding: 24px;
-    font-size: 0.75rem;
-    color: var(--muted);
-    border-top: 1px solid var(--border);
-  }
-
-  /* ── Toasts ───────────────────────────────────────── */
-  .toast-container {
-    position: fixed;
-    bottom: 32px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 100;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    pointer-events: none;
-  }
-
-  .toast {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px 20px;
-    font-size: 0.85rem;
-    animation: toast-in 0.3s ease, toast-out 0.3s ease 2.7s forwards;
-    white-space: nowrap;
-  }
-
-  @keyframes toast-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-  @keyframes toast-out { to { opacity: 0; transform: translateY(-8px); } }
-
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
-
-  @media (max-width: 600px) {
-    header { padding: 20px 24px; }
-    .logo { font-size: 1.4rem; }
-    .voice-orb { width: 150px; height: 150px; }
-  }
 </style>
 </head>
+
 <body>
 
-<div class="bg-orb bg-orb-1" id="orb1"></div>
-<div class="bg-orb bg-orb-2" id="orb2"></div>
+<header>Frienze AI</header>
 
-<div class="app">
-  <header>
-    <div class="logo">Fri<span>enze</span></div>
-<nav>
-  <button class="nav-btn" onclick="showPage('dashboard')">Dashboard</button>
-  <button class="nav-btn" onclick="showPage('settings')">Settings</button>
-  <button class="nav-btn" onclick="showSubscription()">Subscribe</button>
-  <button class="nav-btn primary" id="authBtn" onclick="showAuthModal()">Sign In</button>
-</nav>
-  </header>
+<div class="chat-container" id="chatContainer"></div>
 
-  <!-- ── HOME PAGE ──────────────────────────────────── -->
-  <main id="page-home">
-    <div class="personality-indicator" id="personalityIndicator">
-      <div class="personality-badge">
-        <span class="personality-dot" id="pDot"></span>
-        <span class="personality-label" id="pLabel">Friend</span>
-        <span style="color:var(--muted)">·</span>
-        <span id="pEmoji">😊</span>
-      </div>
-      <div class="personality-subtitle" id="pSubtitle">Say "mom", "dad", or "teacher" to switch</div>
-    </div>
+<div class="input-area">
 
-    <div class="voice-container">
-      <div class="voice-rings" id="voiceRings"></div>
-      <div class="voice-orb" id="voiceOrb" onclick="toggleVoice()">
-        <div class="orb-icon" id="orbIcon">🎙️</div>
-        <div class="waveform" id="waveform">
-          <div class="wave-bar"></div>
-          <div class="wave-bar"></div>
-          <div class="wave-bar"></div>
-          <div class="wave-bar"></div>
-          <div class="wave-bar"></div>
-        </div>
-        <div class="orb-text" id="orbText">Tap to Talk</div>
-      </div>
-    </div>
+<button onclick="toggleVoice()">🎤</button>
 
-    <div class="status-area">
-      <div class="status-message" id="statusMsg">Your AI companion is ready. Tap the orb to start.</div>
-      <div class="transcript-bubble" id="userBubble"></div>
-      <div class="transcript-bubble ai-bubble" id="aiBubble"></div>
-    </div>
+<input
+id="textInput"
+type="text"
+placeholder="Type a message to Frienze..."
+onkeydown="if(event.key==='Enter') sendText()"
+/>
 
-    <div style="margin-top:20px; display:flex; justify-content:center; gap:10px;">
-  <button onclick="toggleVoice()">🎤</button>
+<button onclick="sendText()">Send</button>
 
-  <input
-    id="textInput"
-    type="text"
-    placeholder="Type a message to Frienze..."
-    style="padding:10px;border-radius:8px;border:1px solid #333;background:#1a1a26;color:white;width:250px;"
-  >
-
-  <button onclick="sendText()">Send</button>
 </div>
 
-    <div style="margin-top:20px; display:flex; gap:10px; justify-content:center;">
-  <input 
-    id="textInput"
-    type="text"
-    placeholder="Type a message to Frienze..."
-    style="padding:10px 14px; border-radius:10px; border:1px solid var(--border); background:var(--surface2); color:var(--text); width:260px;"
-  />
-
-  <button onclick="sendText()"
-    style="padding:10px 16px; border-radius:10px; border:none; background:var(--accent); color:#0a0a0f; cursor:pointer;">
-    Send
-  </button>
+<div class="status" id="statusMsg">
+Frienze is ready.
 </div>
-
-    <div class="personality-selector">
-      <button class="p-chip active" data-p="friend" onclick="setPersonality('friend')">😊 Friend</button>
-      <button class="p-chip" data-p="mom" onclick="setPersonality('mom')">💖 Mom</button>
-      <button class="p-chip" data-p="dad" onclick="setPersonality('dad')">🧔 Dad</button>
-      <button class="p-chip" data-p="mentor" onclick="setPersonality('mentor')">🌟 Mentor</button>
-      <button class="p-chip" data-p="teacher" onclick="setPersonality('teacher')">📚 Teacher</button>
-    </div>
-  </main>
-
-  <footer>
-    Frienze — Always here for you &nbsp;·&nbsp; <a href="#" style="color:var(--muted)">Privacy</a>
-  </footer>
-</div>
-
-<div class="toast-container" id="toastContainer"></div>
 
 <script>
-// ── Config ────────────────────────────────────────────
-const WS_URL = 'wss://frienze.onrender.com/ws/voice';
-const PERSONALITY_COLORS = {
-  friend: '#4ECDC4', mom: '#FF6B9D', dad: '#4A90D9',
-  mentor: '#F7B731', teacher: '#A29BFE',
-};
-const PERSONALITY_BG_ACCENT = {
-  friend: 'rgba(78,205,196,0.06)', mom: 'rgba(255,107,157,0.08)',
-  dad: 'rgba(74,144,217,0.06)', mentor: 'rgba(247,183,49,0.07)',
-  teacher: 'rgba(162,155,254,0.06)',
-};
 
-// ── State ─────────────────────────────────────────────
-let ws = null;
-let mediaRecorder = null;
-let audioChunks = [];
-let isRecording = false;
-let currentPersonality = 'friend';
-let sessionId = crypto.randomUUID();
-let audioQueue = [];
-let isPlaying = false;
+let recognition
+let listening=false
 
-// ── WebSocket ─────────────────────────────────────────
-function connectWS() {
-  ws = new WebSocket(`${WS_URL}/${sessionId}`);
-  ws.binaryType = 'arraybuffer';
-
-  ws.onopen = () => {
-    setStatus('Connected ✓');
-    toast('Frienze is ready to listen 🎙️');
-  };
-
-  ws.onmessage = (event) => {
-    const msg = JSON.parse(event.data);
-    handleServerMessage(msg);
-  };
-
-  ws.onclose = () => {
-    setStatus('Reconnecting...');
-    setTimeout(connectWS, 3000);
-  };
-
-  ws.onerror = () => {
-    setStatus('Connection error — check backend');
-  };
+function setStatus(text){
+document.getElementById("statusMsg").textContent=text
 }
 
-function sendJSON(data) {
-  if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify(data));
-  }
+function addMessage(text,type){
+
+const chat=document.getElementById("chatContainer")
+
+const msg=document.createElement("div")
+
+msg.className="message "+type
+
+msg.textContent=text
+
+chat.appendChild(msg)
+
+chat.scrollTop=chat.scrollHeight
+
 }
 
-function handleServerMessage(msg) {
-  switch (msg.type) {
-    case 'transcription':
-      showBubble('userBubble', `"${msg.text}"`);
-      setStatus('');
-      break;
-    case 'ai_text':
-      showBubble('aiBubble', msg.text);
-      break;
-    case 'personality_changed':
-      updatePersonality(msg.personality, msg.trigger);
-      break;
-    case 'emotion_detected':
-      setStatus(`Detected emotion: ${msg.emotion} (${Math.round(msg.confidence * 100)}%)`);
-      break;
-    case 'audio_response':
-      queueAudio(msg.audio_base64);
-      break;
-    case 'processing':
-      const steps = { transcribing: '🔤 Understanding you...', thinking: '💭 Thinking...', speaking: '🔊 Preparing voice...' };
-      setStatus(steps[msg.step] || 'Processing...');
-      setOrbState('processing');
-      break;
-    case 'no_speech':
-      setStatus('Frienze didn’t catch that. Please try again.');
-      resetOrb();
-      break;
-    case 'too_short':
-      setStatus('Hold the orb longer while speaking.');
-      resetOrb();
-      break;
-    case 'error':
-      setStatus(`Error: ${msg.message}`);
-      resetOrb();
-      toast(`⚠️ ${msg.message}`, 'error');
-      break;
-  }
+function sendText(){
+
+const input=document.getElementById("textInput")
+
+const message=input.value.trim()
+
+if(!message) return
+
+addMessage(message,"user")
+
+input.value=""
+
+setStatus("Frienze is thinking...")
+
+setTimeout(()=>{
+
+addMessage("Hi! I'm Frienze. Full AI replies will connect soon.","ai")
+
+setStatus("Frienze is ready")
+
+},1000)
+
 }
 
-// ── Voice Recording ────────────────────────────────────
-async function toggleVoice() {
-  if (isRecording) stopRecording();
-  else await startRecording();
+function toggleVoice(){
+
+if(!('webkitSpeechRecognition' in window)){
+alert("Speech recognition not supported in this browser")
+return
 }
 
-async function startRecording() {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-    audioChunks = [];
+if(!recognition){
 
-    mediaRecorder.ondataavailable = (e) => {
-      if (e.data.size > 0 && ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(e.data);  // Stream chunks as binary
-      }
-    };
+recognition=new webkitSpeechRecognition()
 
-    mediaRecorder.onstop = () => {
-      stream.getTracks().forEach(t => t.stop());
-      sendJSON({ type: 'stop_recording' });
-    };
+recognition.continuous=false
+recognition.interimResults=false
+recognition.lang="en-US"
 
-    sendJSON({ type: 'start_recording' });
-    mediaRecorder.start(250);  // Send chunks every 250ms
-    isRecording = true;
-    setOrbState('recording');
-    setStatus('Listening... tap again when done.');
-  } catch (e) {
-    toast('🎤 Microphone access required', 'error');
-    setStatus('Please allow microphone access.');
-  }
+recognition.onstart=function(){
+listening=true
+setStatus("Listening...")
 }
 
-function stopRecording() {
-  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-    mediaRecorder.stop();
-  }
-  isRecording = false;
-  setOrbState('processing');
-  setStatus('Processing your voice...');
+recognition.onend=function(){
+listening=false
+setStatus("Frienze is ready")
 }
 
-// ── Audio Playback ─────────────────────────────────────
-function queueAudio(base64) {
-  audioQueue.push(base64);
-  if (!isPlaying) playNext();
+recognition.onerror=function(e){
+setStatus("Voice error: "+e.error)
 }
 
-async function playNext() {
-  if (audioQueue.length === 0) { isPlaying = false; resetOrb(); return; }
-  isPlaying = true;
-  setOrbState('speaking');
-  const b64 = audioQueue.shift();
-  const binary = atob(b64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  const blob = new Blob([bytes], { type: 'audio/mp3' });
-  const url = URL.createObjectURL(blob);
-  const audio = new Audio(url);
-  audio.onended = () => { URL.revokeObjectURL(url); playNext(); };
-  audio.onerror = () => { URL.revokeObjectURL(url); playNext(); };
-  await audio.play().catch(() => playNext());
+recognition.onresult=function(event){
+
+const text=event.results[0][0].transcript
+
+addMessage(text,"user")
+
+setStatus("Frienze thinking...")
+
+setTimeout(()=>{
+
+addMessage("I heard: "+text,"ai")
+
+setStatus("Frienze is ready")
+
+},1000)
+
 }
 
-// ── Personality ────────────────────────────────────────
-function setPersonality(p) {
-  currentPersonality = p;
-  sendJSON({ type: 'set_personality', personality: p });
-  updatePersonalityUI(p, 'manual');
 }
 
-function updatePersonality(p, trigger) {
-  currentPersonality = p;
-  updatePersonalityUI(p, trigger);
-  if (trigger && trigger !== 'manual') {
-    toast(`Switched to ${p.charAt(0).toUpperCase() + p.slice(1)} ${getEmoji(p)}`);
-  }
+if(!listening){
+recognition.start()
+}else{
+recognition.stop()
 }
 
-function updatePersonalityUI(p, trigger) {
-  const color = PERSONALITY_COLORS[p];
-  const emoji = getEmoji(p);
-  const label = p.charAt(0).toUpperCase() + p.slice(1);
-
-  document.getElementById('pDot').style.background = color;
-  document.getElementById('pDot').style.boxShadow = `0 0 8px ${color}`;
-  document.getElementById('pLabel').textContent = label;
-  document.getElementById('pLabel').style.color = color;
-  document.getElementById('pEmoji').textContent = emoji;
-
-  // Update background orb
-  document.getElementById('orb2').style.background =
-    `radial-gradient(circle, ${PERSONALITY_BG_ACCENT[p].replace('0.', '0.1')} 0%, transparent 70%)`;
-
-  // Update chips
-  document.querySelectorAll('.p-chip').forEach(c => {
-    c.classList.toggle('active', c.dataset.p === p);
-  });
 }
 
-function getEmoji(p) {
-  return { friend: '😊', mom: '💖', dad: '🧔', mentor: '🌟', teacher: '📚' }[p] || '😊';
-}
-
-// ── Orb States ─────────────────────────────────────────
-function setOrbState(state) {
-  const orb = document.getElementById('voiceOrb');
-  const icon = document.getElementById('orbIcon');
-  const text = document.getElementById('orbText');
-  const wave = document.getElementById('waveform');
-
-  orb.className = 'voice-orb ' + state;
-
-  if (state === 'recording') {
-    icon.style.display = 'none';
-    wave.classList.add('active');
-    text.textContent = 'Listening...';
-  } else if (state === 'processing') {
-    icon.style.display = 'block';
-    icon.textContent = '⏳';
-    wave.classList.remove('active');
-    text.textContent = 'Processing...';
-  } else if (state === 'speaking') {
-    icon.style.display = 'block';
-    icon.textContent = '🔊';
-    wave.classList.remove('active');
-    text.textContent = 'Speaking...';
-  } else {
-    resetOrb();
-  }
-}
-
-function resetOrb() {
-  const orb = document.getElementById('voiceOrb');
-  const icon = document.getElementById('orbIcon');
-  const text = document.getElementById('orbText');
-  const wave = document.getElementById('waveform');
-  orb.className = 'voice-orb';
-  icon.style.display = 'block';
-  icon.textContent = '🎙️';
-  wave.classList.remove('active');
-  text.textContent = 'Tap to Talk';
-  isPlaying = false;
-}
-
-// ── UI Helpers ─────────────────────────────────────────
-function setStatus(msg) {
-  document.getElementById('statusMsg').textContent = msg;
-}
-
-function showBubble(id, text) {
-  const el = document.getElementById(id);
-  el.textContent = text;
-  el.classList.add('visible');
-}
-
-function toast(msg, type = 'info') {
-  const container = document.getElementById('toastContainer');
-  const t = document.createElement('div');
-  t.className = 'toast';
-  t.textContent = msg;
-  if (type === 'error') t.style.borderColor = 'rgba(255,100,100,0.3)';
-  container.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
-}
-
-function showPage(page) {
-  toast(`${page.charAt(0).toUpperCase() + page.slice(1)} coming soon ✨`);
-}
-
-function showAuthModal() {
-  toast('Auth system — connect your backend');
-}
-function showSubscription() {
-  toast("Subscription system coming soon 💳");
-}
-
-function sendText() {
-  const input = document.getElementById("textInput");
-  const message = input.value.trim();
-
-  if (!message) return;
-
-  showBubble("userBubble", message);
-
-  setStatus("Frienze is thinking...");
-  setOrbState("processing");
-
-  setTimeout(() => {
-    showBubble("aiBubble", "Hi! I'm Frienze. Voice responses work right now. Text AI will be added soon.");
-    resetOrb();
-  }, 1200);
-
-  input.value = "";
-}
-
-// ── Init ───────────────────────────────────────────────
-connectWS();
-updatePersonalityUI('friend');
 </script>
+
 </body>
 </html>
+```

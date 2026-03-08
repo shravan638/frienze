@@ -460,6 +460,19 @@
       <div class="transcript-bubble ai-bubble" id="aiBubble"></div>
     </div>
 
+    <div style="margin-top:20px; display:flex; justify-content:center; gap:10px;">
+  <button onclick="toggleVoice()">🎤</button>
+
+  <input
+    id="textInput"
+    type="text"
+    placeholder="Type a message to Frienze..."
+    style="padding:10px;border-radius:8px;border:1px solid #333;background:#1a1a26;color:white;width:250px;"
+  >
+
+  <button onclick="sendText()">Send</button>
+</div>
+
     <div style="margin-top:20px; display:flex; gap:10px; justify-content:center;">
   <input 
     id="textInput"
@@ -769,10 +782,13 @@ function sendText() {
 
   showBubble("userBubble", message);
 
-  sendJSON({
-    type: "text_message",
-    text: message
-  });
+  setStatus("Frienze is thinking...");
+  setOrbState("processing");
+
+  setTimeout(() => {
+    showBubble("aiBubble", "Hi! I'm Frienze. Voice responses work right now. Text AI will be added soon.");
+    resetOrb();
+  }, 1200);
 
   input.value = "";
 }

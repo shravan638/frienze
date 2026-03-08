@@ -460,6 +460,20 @@
       <div class="transcript-bubble ai-bubble" id="aiBubble"></div>
     </div>
 
+    <div style="margin-top:20px; display:flex; gap:10px; justify-content:center;">
+  <input 
+    id="textInput"
+    type="text"
+    placeholder="Type a message to Frienze..."
+    style="padding:10px 14px; border-radius:10px; border:1px solid var(--border); background:var(--surface2); color:var(--text); width:260px;"
+  />
+
+  <button onclick="sendText()"
+    style="padding:10px 16px; border-radius:10px; border:none; background:var(--accent); color:#0a0a0f; cursor:pointer;">
+    Send
+  </button>
+</div>
+
     <div class="personality-selector">
       <button class="p-chip active" data-p="friend" onclick="setPersonality('friend')">😊 Friend</button>
       <button class="p-chip" data-p="mom" onclick="setPersonality('mom')">💖 Mom</button>
@@ -554,7 +568,7 @@ function handleServerMessage(msg) {
       setOrbState('processing');
       break;
     case 'no_speech':
-      setStatus('No speech detected. Try again.');
+      setStatus('Frienze didn’t catch that. Please try again.');
       resetOrb();
       break;
     case 'too_short':
@@ -747,6 +761,23 @@ function showAuthModal() {
 function showSubscription() {
   toast("Subscription system coming soon 💳");
 }
+
+function sendText() {
+  const input = document.getElementById("textInput");
+  const message = input.value.trim();
+
+  if (!message) return;
+
+  showBubble("userBubble", message);
+
+  sendJSON({
+    type: "text_message",
+    text: message
+  });
+
+  input.value = "";
+}
+
 // ── Init ───────────────────────────────────────────────
 connectWS();
 updatePersonalityUI('friend');

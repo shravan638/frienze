@@ -1,161 +1,437 @@
-body{
-margin:0;
-font-family:Inter,Arial,Helvetica,sans-serif;
-background:#0b0b12;
-color:white;
-display:flex;
-height:100vh;
-overflow:hidden;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Frienze AI — Your Emotional Companion</title>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#080c14;--sidebar:#0d1220;--surface:#111827;--surface2:#161f30;
+  --border:#1e2d45;--gold:#c8a96e;--teal:#4ac6c6;--blue:#3b82f6;
+  --green:#6dd5a0;--text:#e8edf5;--muted:#7a8ba8;
+  --user-bubble:#1a2540;--ai-bubble:#0f1e35;
 }
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 600px 400px at 10% 20%,rgba(74,198,198,0.04) 0%,transparent 70%),radial-gradient(ellipse 500px 500px at 90% 80%,rgba(200,169,110,0.05) 0%,transparent 70%);pointer-events:none;z-index:0;}
 
 /* SIDEBAR */
-
-.sidebar{
-width:280px;
-background:#11111a;
-border-right:1px solid #1f1f2b;
-display:flex;
-flex-direction:column;
-}
-
-.sidebar-header{
-padding:22px;
-font-size:20px;
-font-weight:600;
-color:#c8a96e;
-letter-spacing:0.5px;
-border-bottom:1px solid #1f1f2b;
-}
-
-.new-chat{
-margin:16px;
-padding:12px;
-background:#1c1c2b;
-border:none;
-border-radius:8px;
-color:white;
-cursor:pointer;
-font-size:14px;
-transition:0.2s;
-}
-
-.new-chat:hover{
-background:#26263b;
-}
-
-.history{
-flex:1;
-overflow-y:auto;
-padding:10px;
-}
-
-.history-item{
-padding:12px;
-border-radius:8px;
-cursor:pointer;
-margin-bottom:8px;
-background:#181825;
-font-size:14px;
-transition:0.2s;
-border:1px solid transparent;
-}
-
-.history-item:hover{
-background:#222233;
-border-color:#2c2c44;
-}
+.sidebar{width:270px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;position:relative;z-index:1;flex-shrink:0;}
+.logo-area{display:flex;align-items:center;gap:12px;padding:20px 18px;border-bottom:1px solid var(--border);}
+.logo-svg{width:44px;height:44px;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(74,198,198,0.5));animation:logoGlow 3s ease-in-out infinite alternate;}
+@keyframes logoGlow{from{filter:drop-shadow(0 0 6px rgba(74,198,198,0.4));}to{filter:drop-shadow(0 0 14px rgba(200,169,110,0.6));}}
+.logo-name{font-family:'Quicksand',sans-serif;font-size:18px;font-weight:700;background:linear-gradient(135deg,var(--teal),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:0.5px;}
+.logo-tagline{font-size:10px;color:var(--muted);font-style:italic;}
+.new-chat-btn{margin:14px;padding:11px 16px;background:linear-gradient(135deg,rgba(74,198,198,0.15),rgba(200,169,110,0.1));border:1px solid rgba(74,198,198,0.3);border-radius:12px;color:var(--teal);cursor:pointer;font-size:13px;font-family:'Quicksand',sans-serif;font-weight:600;transition:all 0.2s;display:flex;align-items:center;gap:8px;}
+.new-chat-btn:hover{background:linear-gradient(135deg,rgba(74,198,198,0.25),rgba(200,169,110,0.15));border-color:var(--teal);transform:translateY(-1px);box-shadow:0 4px 16px rgba(74,198,198,0.15);}
+.history-label{padding:10px 18px 6px;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;}
+.history{flex:1;overflow-y:auto;padding:4px 10px 10px;}
+.history::-webkit-scrollbar{width:4px;}.history::-webkit-scrollbar-thumb{background:#1e2d45;border-radius:2px;}
+.history-item{padding:11px 14px;border-radius:10px;cursor:pointer;margin-bottom:4px;font-size:13px;color:var(--muted);transition:all 0.2s;border:1px solid transparent;display:flex;align-items:center;gap:10px;overflow:hidden;}
+.history-item span.ht{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.history-item:hover{background:var(--surface);color:var(--text);border-color:var(--border);}
+.history-item.active{background:var(--surface2);color:var(--text);border-color:rgba(74,198,198,0.2);}
 
 /* MAIN */
-
-.main{
-flex:1;
-display:flex;
-flex-direction:column;
-background:#0f0f18;
-}
-
-.header{
-padding:20px;
-font-size:18px;
-font-weight:500;
-border-bottom:1px solid #1f1f2b;
-}
+.main{flex:1;display:flex;flex-direction:column;position:relative;z-index:1;min-width:0;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border);background:rgba(13,18,32,0.6);backdrop-filter:blur(10px);}
+.topbar-title{font-family:'Quicksand',sans-serif;font-size:16px;font-weight:700;}
+.topbar-sub{font-size:11px;color:var(--muted);}
+.mood-indicator{display:flex;align-items:center;gap:8px;padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:12px;color:var(--muted);}
+.mood-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
 
 /* CHAT */
+.chat{flex:1;overflow-y:auto;padding:28px 36px;display:flex;flex-direction:column;gap:20px;scroll-behavior:smooth;}
+.chat::-webkit-scrollbar{width:5px;}.chat::-webkit-scrollbar-thumb{background:#1e2d45;border-radius:3px;}
 
-.chat{
-flex:1;
-overflow-y:auto;
-padding:30px;
-display:flex;
-flex-direction:column;
-gap:16px;
-}
+/* WELCOME */
+.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:20px;text-align:center;padding:40px;animation:fadeIn 0.6s ease;}
+.welcome-logo{width:80px;height:80px;filter:drop-shadow(0 0 20px rgba(74,198,198,0.4));animation:float 4s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+.welcome h2{font-family:'Quicksand',sans-serif;font-size:26px;font-weight:700;background:linear-gradient(135deg,var(--teal),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.welcome p{color:var(--muted);font-size:14px;max-width:380px;line-height:1.7;}
+.welcome-chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:8px;}
+.chip{padding:8px 16px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:12px;color:var(--muted);cursor:pointer;transition:all 0.2s;}
+.chip:hover{border-color:var(--teal);color:var(--teal);background:rgba(74,198,198,0.05);}
 
-.message{
-max-width:60%;
-padding:14px 18px;
-border-radius:14px;
-font-size:15px;
-line-height:1.5;
-}
-
-.user{
-background:#1e1e2d;
-align-self:flex-end;
-}
-
-.ai{
-background:#202033;
-border:1px solid rgba(200,169,110,0.25);
-align-self:flex-start;
-}
+/* MESSAGES */
+.msg-row{display:flex;gap:14px;animation:slideUp 0.3s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.msg-row.user-row{flex-direction:row-reverse;}
+.avatar{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:2px;}
+.avatar.ai-avatar{background:linear-gradient(135deg,rgba(74,198,198,0.2),rgba(59,130,246,0.2));border:1px solid rgba(74,198,198,0.3);}
+.avatar.user-avatar{background:linear-gradient(135deg,rgba(200,169,110,0.2),rgba(200,169,110,0.1));border:1px solid rgba(200,169,110,0.3);font-size:13px;font-weight:700;color:var(--gold);font-family:'Quicksand',sans-serif;}
+.bubble{max-width:62%;padding:14px 18px;border-radius:18px;font-size:14px;line-height:1.7;position:relative;}
+.bubble.user-bubble{background:var(--user-bubble);border:1px solid rgba(200,169,110,0.15);border-top-right-radius:4px;}
+.bubble.ai-bubble{background:var(--ai-bubble);border:1px solid rgba(74,198,198,0.15);border-top-left-radius:4px;}
+.typing-indicator{display:flex;gap:5px;align-items:center;}
+.typing-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:typing 1.2s infinite;}
+.typing-dot:nth-child(2){animation-delay:0.2s;}.typing-dot:nth-child(3){animation-delay:0.4s;}
+@keyframes typing{0%,60%,100%{transform:translateY(0);opacity:0.3;}30%{transform:translateY(-6px);opacity:1;}}
 
 /* INPUT */
+.input-area{padding:16px 28px 20px;border-top:1px solid var(--border);background:rgba(13,18,32,0.8);backdrop-filter:blur(10px);}
+.input-box{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:6px 8px 6px 16px;transition:all 0.2s;}
+.input-box:focus-within{border-color:rgba(74,198,198,0.4);box-shadow:0 0 0 3px rgba(74,198,198,0.08);}
+#textInput{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:14px;font-family:'Nunito',sans-serif;padding:8px 0;resize:none;min-height:24px;max-height:120px;line-height:1.5;}
+#textInput::placeholder{color:var(--muted);}
+.icon-btn{width:38px;height:38px;border-radius:10px;border:none;background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all 0.2s;flex-shrink:0;}
+.icon-btn:hover{background:var(--surface2);color:var(--text);}
+.icon-btn.active{background:rgba(74,198,198,0.15);color:var(--teal);animation:micPulse 1s infinite;}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(74,198,198,0.3);}50%{box-shadow:0 0 0 6px rgba(74,198,198,0);}}
+.send-btn{width:40px;height:40px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--teal),#3a9f9f);color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all 0.2s;flex-shrink:0;box-shadow:0 4px 12px rgba(74,198,198,0.25);}
+.send-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(74,198,198,0.35);}
+.send-btn:active{transform:translateY(0);}
+.input-footer{display:flex;justify-content:space-between;align-items:center;padding:8px 4px 0;}
+.status-text{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;}
+.hint-text{font-size:11px;color:var(--muted);opacity:0.6;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+</style>
+</head>
+<body>
 
-.input-area{
-display:flex;
-gap:12px;
-padding:18px;
-border-top:1px solid #1f1f2b;
-background:#0f0f18;
+<div class="sidebar">
+  <div class="logo-area">
+    <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4ac6c6"/><stop offset="100%" stop-color="#3b6ea0"/></linearGradient>
+        <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#c8a96e"/><stop offset="100%" stop-color="#e0c080"/></linearGradient>
+        <linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6dd5a0"/><stop offset="100%" stop-color="#4ac6c6"/></linearGradient>
+      </defs>
+      <circle cx="50" cy="50" r="46" fill="none" stroke="url(#g1)" stroke-width="2" opacity="0.4"/>
+      <path d="M50 8 C72 8,88 26,88 50 C88 62,82 72,72 78 C66 82,60 82,54 80 C44 76,40 64,40 56 C40 44,46 38,50 38 C58 38,62 46,62 50 C62 58,56 62,50 62 C44 62,38 56,38 50 C38 26,24 8,50 8Z" fill="url(#g1)" opacity="0.85"/>
+      <path d="M50 92 C28 92,12 74,12 50 C12 38,18 28,28 22 C34 18,40 18,46 20 C56 24,60 36,60 44 C60 56,54 62,50 62 C42 62,38 54,38 50 C38 42,44 38,50 38 C56 38,62 44,62 50 C62 74,76 92,50 92Z" fill="url(#g2)" opacity="0.85"/>
+      <path d="M42 22 C42 18,46 15,50 18 C54 15,58 18,58 22 C58 26,54 30,50 34 C46 30,42 26,42 22Z" fill="url(#g1)" opacity="0.9"/>
+      <line x1="62" y1="50" x2="76" y2="38" stroke="url(#g3)" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+      <line x1="76" y1="38" x2="82" y2="30" stroke="url(#g3)" stroke-width="1.8" stroke-linecap="round" opacity="0.6"/>
+      <line x1="76" y1="38" x2="84" y2="42" stroke="url(#g3)" stroke-width="1.8" stroke-linecap="round" opacity="0.6"/>
+      <line x1="62" y1="50" x2="78" y2="54" stroke="url(#g3)" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      <line x1="62" y1="50" x2="74" y2="64" stroke="url(#g3)" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      <circle cx="83" cy="29" r="3" fill="#c8a96e" opacity="0.8"/>
+      <circle cx="85" cy="42" r="3" fill="#6dd5a0" opacity="0.8"/>
+      <circle cx="87" cy="50" r="3" fill="#c8a96e" opacity="0.7"/>
+      <circle cx="75" cy="65" r="3" fill="#6dd5a0" opacity="0.7"/>
+      <ellipse cx="44" cy="62" rx="13" ry="11" fill="url(#g3)" opacity="0.9"/>
+      <path d="M38 70 L34 76 L46 72" fill="url(#g3)" opacity="0.9"/>
+      <circle cx="40" cy="60" r="1.8" fill="white" opacity="0.9"/>
+      <circle cx="48" cy="60" r="1.8" fill="white" opacity="0.9"/>
+      <path d="M39 65 Q44 69 49 65" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.9"/>
+      <circle cx="38" cy="68" r="1.5" fill="white" opacity="0.6"/>
+      <circle cx="44" cy="71" r="1.5" fill="white" opacity="0.5"/>
+    </svg>
+    <div class="logo-text">
+      <span class="logo-name">Frienze AI</span>
+      <span class="logo-tagline">Your Emotional Companion</span>
+    </div>
+  </div>
+
+  <button class="new-chat-btn" onclick="newChat()"><span>✦</span> New Conversation</button>
+  <div class="history-label">Recent Chats</div>
+  <div class="history" id="history"></div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title">Your AI Companion</div>
+      <div class="topbar-sub">Always here for you ✦</div>
+    </div>
+    <div class="mood-indicator">
+      <div class="mood-dot"></div>
+      <span id="moodText">Frienze is ready</span>
+    </div>
+  </div>
+
+  <div class="chat" id="chat">
+    <div class="welcome" id="welcome">
+      <svg class="welcome-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="wg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4ac6c6"/><stop offset="100%" stop-color="#3b6ea0"/></linearGradient>
+          <linearGradient id="wg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#c8a96e"/><stop offset="100%" stop-color="#e0c080"/></linearGradient>
+          <linearGradient id="wg3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6dd5a0"/><stop offset="100%" stop-color="#4ac6c6"/></linearGradient>
+        </defs>
+        <circle cx="50" cy="50" r="46" fill="none" stroke="url(#wg1)" stroke-width="2" opacity="0.4"/>
+        <path d="M50 8 C72 8,88 26,88 50 C88 62,82 72,72 78 C66 82,60 82,54 80 C44 76,40 64,40 56 C40 44,46 38,50 38 C58 38,62 46,62 50 C62 58,56 62,50 62 C44 62,38 56,38 50 C38 26,24 8,50 8Z" fill="url(#wg1)" opacity="0.85"/>
+        <path d="M50 92 C28 92,12 74,12 50 C12 38,18 28,28 22 C34 18,40 18,46 20 C56 24,60 36,60 44 C60 56,54 62,50 62 C42 62,38 54,38 50 C38 42,44 38,50 38 C56 38,62 44,62 50 C62 74,76 92,50 92Z" fill="url(#wg2)" opacity="0.85"/>
+        <path d="M42 22 C42 18,46 15,50 18 C54 15,58 18,58 22 C58 26,54 30,50 34 C46 30,42 26,42 22Z" fill="url(#wg1)" opacity="0.9"/>
+        <line x1="62" y1="50" x2="76" y2="38" stroke="url(#wg3)" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+        <line x1="76" y1="38" x2="82" y2="30" stroke="url(#wg3)" stroke-width="1.8" stroke-linecap="round" opacity="0.6"/>
+        <line x1="76" y1="38" x2="84" y2="42" stroke="url(#wg3)" stroke-width="1.8" stroke-linecap="round" opacity="0.6"/>
+        <line x1="62" y1="50" x2="78" y2="54" stroke="url(#wg3)" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+        <line x1="62" y1="50" x2="74" y2="64" stroke="url(#wg3)" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+        <circle cx="83" cy="29" r="3" fill="#c8a96e" opacity="0.8"/>
+        <circle cx="85" cy="42" r="3" fill="#6dd5a0" opacity="0.8"/>
+        <circle cx="87" cy="50" r="3" fill="#c8a96e" opacity="0.7"/>
+        <ellipse cx="44" cy="62" rx="13" ry="11" fill="url(#wg3)" opacity="0.9"/>
+        <path d="M38 70 L34 76 L46 72" fill="url(#wg3)" opacity="0.9"/>
+        <circle cx="40" cy="60" r="1.8" fill="white" opacity="0.9"/>
+        <circle cx="48" cy="60" r="1.8" fill="white" opacity="0.9"/>
+        <path d="M39 65 Q44 69 49 65" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.9"/>
+      </svg>
+      <h2>Hello, I'm Frienze 💙</h2>
+      <p>Your emotional AI companion — here to listen, understand, and grow with you. What's on your mind today?</p>
+      <div class="welcome-chips">
+        <div class="chip" onclick="chipSend('Just want to chat')">💬 Just want to chat</div>
+        <div class="chip" onclick="chipSend('I need some support today')">🫂 I need support</div>
+        <div class="chip" onclick="chipSend('I have something exciting to share!')">✨ Share something exciting</div>
+        <div class="chip" onclick="chipSend('I\'m feeling a bit low today')">😔 Feeling low today</div>
+        <div class="chip" onclick="chipSend('Help me grow and improve myself')">🌱 Help me grow</div>
+        <div class="chip" onclick="chipSend('Tell me something fun or funny!')">😂 Something fun</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <div class="input-box">
+      <textarea id="textInput" placeholder="Talk to Frienze…" rows="1"
+        oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+      <button class="icon-btn" id="voiceBtn" onclick="toggleVoice()" title="Voice input">🎙️</button>
+      <button class="send-btn" onclick="sendMessage()" title="Send">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+    <div class="input-footer">
+      <div class="status-text">
+        <span id="statusDot" style="width:6px;height:6px;border-radius:50%;background:#6dd5a0;box-shadow:0 0 6px #6dd5a0;display:inline-block;"></span>
+        <span id="statusMsg">Ready to listen</span>
+      </div>
+      <span class="hint-text">Enter to send · Shift+Enter for new line</span>
+    </div>
+  </div>
+</div>
+
+<script>
+let sessions = JSON.parse(localStorage.getItem('frienze_sessions') || '[]');
+let currentId = null;
+let recognition = null;
+let isListening = false;
+
+if (sessions.length === 0) {
+  newChat();
+} else {
+  currentId = sessions[sessions.length - 1].id;
+  renderHistory();
+  const cur = getSession();
+  if (cur && cur.messages.length > 0) {
+    hideWelcome(true);
+    renderChat();
+  }
 }
 
-#textInput{
-flex:1;
-padding:14px;
-border-radius:10px;
-border:1px solid #2a2a3a;
-background:#161622;
-color:white;
-font-size:14px;
-outline:none;
+function getSession(id) {
+  return sessions.find(s => s.id === (id || currentId));
 }
 
-#textInput:focus{
-border-color:#c8a96e;
+function saveAll() {
+  localStorage.setItem('frienze_sessions', JSON.stringify(sessions));
 }
 
-button{
-background:#1e1e2d;
-border:none;
-padding:12px 16px;
-border-radius:10px;
-color:white;
-cursor:pointer;
-font-size:15px;
-transition:0.2s;
+function newChat() {
+  const id = Date.now();
+  sessions.push({ id, title: 'New conversation', messages: [] });
+  currentId = id;
+  saveAll();
+  renderHistory();
+  clearChatArea();
+  hideWelcome(false);
+  setStatus('Ready to listen', '#6dd5a0');
+  setMood('Frienze is ready');
 }
 
-button:hover{
-background:#2a2a40;
+function clearChatArea() {
+  const chat = document.getElementById('chat');
+  Array.from(chat.children).forEach(c => { if (c.id !== 'welcome') c.remove(); });
 }
 
-/* STATUS */
-
-.status{
-font-size:12px;
-color:#8c8c9f;
-padding-left:20px;
-padding-bottom:10px;
+function hideWelcome(hide) {
+  const w = document.getElementById('welcome');
+  if (w) w.style.display = hide ? 'none' : 'flex';
 }
+
+function renderHistory() {
+  const h = document.getElementById('history');
+  h.innerHTML = '';
+  [...sessions].reverse().forEach(s => {
+    const item = document.createElement('div');
+    item.className = 'history-item' + (s.id === currentId ? ' active' : '');
+    item.innerHTML = '<span style="font-size:14px;flex-shrink:0">💬</span><span class="ht">' + s.title + '</span>';
+    item.onclick = () => loadSession(s.id);
+    h.appendChild(item);
+  });
+}
+
+function loadSession(id) {
+  currentId = id;
+  renderHistory();
+  clearChatArea();
+  hideWelcome(true);
+  renderChat();
+  setStatus('Ready to listen', '#6dd5a0');
+  setMood('Frienze is ready');
+}
+
+function renderChat() {
+  const s = getSession();
+  if (!s) return;
+  clearChatArea();
+  s.messages.forEach(m => {
+    document.getElementById('chat').appendChild(buildBubble(m.role, m.content));
+  });
+  scrollBottom();
+}
+
+function buildBubble(role, content) {
+  const row = document.createElement('div');
+  row.className = 'msg-row' + (role === 'user' ? ' user-row' : '');
+  const av = document.createElement('div');
+  av.className = 'avatar ' + (role === 'user' ? 'user-avatar' : 'ai-avatar');
+  av.textContent = role === 'user' ? 'You' : '💙';
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble ' + (role === 'user' ? 'user-bubble' : 'ai-bubble');
+  bubble.textContent = content;
+  row.appendChild(av);
+  row.appendChild(bubble);
+  return row;
+}
+
+function scrollBottom() {
+  const chat = document.getElementById('chat');
+  chat.scrollTop = chat.scrollHeight;
+}
+
+async function sendMessage() {
+  const input = document.getElementById('textInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  autoResize(input);
+
+  hideWelcome(true);
+  const session = getSession();
+  if (!session) return;
+
+  if (session.messages.length === 0) {
+    session.title = text.slice(0, 30) + (text.length > 30 ? '…' : '');
+    renderHistory();
+  }
+
+  session.messages.push({ role: 'user', content: text });
+  saveAll();
+  document.getElementById('chat').appendChild(buildBubble('user', text));
+
+  // Typing
+  const typingRow = document.createElement('div');
+  typingRow.className = 'msg-row'; typingRow.id = 'typing';
+  typingRow.innerHTML = '<div class="avatar ai-avatar">💙</div><div class="bubble ai-bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>';
+  document.getElementById('chat').appendChild(typingRow);
+  scrollBottom();
+  setStatus('Frienze is thinking…', '#c8a96e');
+  setMood('Frienze is thinking…');
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: 'You are Frienze, a warm, empathetic, and emotionally intelligent AI companion. Your name means "friend." You genuinely care about the person you talk to. You listen deeply, reflect emotions kindly, and give thoughtful human-feeling responses. You are not a generic assistant — you are a true friend who understands feelings, celebrates wins, provides comfort, and is always curious. Keep responses warm, personal, conversational — not too long, never robotic. Use gentle emojis occasionally. Never mention Anthropic or Claude — you are simply Frienze.',
+        messages: session.messages.map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.content }))
+      })
+    });
+    const data = await resp.json();
+    const reply = data.content?.[0]?.text || "I'm here with you 💙 Could you tell me more?";
+    document.getElementById('typing')?.remove();
+    session.messages.push({ role: 'ai', content: reply });
+    saveAll();
+    document.getElementById('chat').appendChild(buildBubble('ai', reply));
+    scrollBottom();
+    setStatus('Ready to listen', '#6dd5a0');
+    setMood('Frienze is ready');
+    speakText(reply);
+  } catch (e) {
+    document.getElementById('typing')?.remove();
+    const fallback = "I'm sorry, something went wrong. I'm still here for you 💙";
+    session.messages.push({ role: 'ai', content: fallback });
+    saveAll();
+    document.getElementById('chat').appendChild(buildBubble('ai', fallback));
+    scrollBottom();
+    setStatus('Connection issue', '#ff6b6b');
+  }
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function chipSend(text) {
+  document.getElementById('textInput').value = text;
+  sendMessage();
+}
+
+function setStatus(msg, color) {
+  document.getElementById('statusMsg').textContent = msg;
+  document.getElementById('statusDot').style.background = color;
+  document.getElementById('statusDot').style.boxShadow = '0 0 6px ' + color;
+}
+function setMood(text) { document.getElementById('moodText').textContent = text; }
+
+function toggleVoice() {
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    alert('Voice input needs Chrome or Edge!'); return;
+  }
+  if (isListening) { recognition?.stop(); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.lang = 'en-US'; recognition.continuous = false; recognition.interimResults = true;
+  recognition.onstart = () => {
+    isListening = true;
+    document.getElementById('voiceBtn').classList.add('active');
+    document.getElementById('voiceBtn').textContent = '🔴';
+    setStatus('Listening…', '#4ac6c6');
+  };
+  recognition.onresult = (e) => {
+    const t = Array.from(e.results).map(r => r[0].transcript).join('');
+    document.getElementById('textInput').value = t;
+    autoResize(document.getElementById('textInput'));
+  };
+  recognition.onend = () => {
+    isListening = false;
+    document.getElementById('voiceBtn').classList.remove('active');
+    document.getElementById('voiceBtn').textContent = '🎙️';
+    setStatus('Ready to listen', '#6dd5a0');
+    if (document.getElementById('textInput').value.trim()) sendMessage();
+  };
+  recognition.onerror = () => {
+    isListening = false;
+    document.getElementById('voiceBtn').classList.remove('active');
+    document.getElementById('voiceBtn').textContent = '🎙️';
+    setStatus('Voice error — try again', '#ff6b6b');
+  };
+  recognition.start();
+}
+
+function speakText(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const short = text.length > 250 ? text.slice(0, 250) + '…' : text;
+  const utt = new SpeechSynthesisUtterance(short);
+  utt.lang = 'en-US'; utt.pitch = 1.1; utt.rate = 0.95; utt.volume = 1;
+  const voices = window.speechSynthesis.getVoices();
+  const v = voices.find(v => v.name.includes('Samantha') || v.name.includes('Karen') || v.name.includes('Google UK English Female'));
+  if (v) utt.voice = v;
+  window.speechSynthesis.speak(utt);
+}
+window.speechSynthesis?.addEventListener?.('voiceschanged', () => {});
+</script>
+</body>
+</html>

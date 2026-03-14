@@ -333,24 +333,20 @@ async function sendMessage() {
   setMood('Frienze is thinking…');
 
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'x-api-key': 'YOUR_ANTHROPIC_API_KEY_HERE',
-    'anthropic-version': '2023-06-01',
-    'anthropic-dangerous-direct-browser-access': 'true'
-  },
-      
+    const GEMINI_KEY = 'AIzaSyBeQ_YhPcVEYLxTA09XLLTcanLhbKJIUXw';
+    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: 'You are Frienze, a warm, empathetic, and emotionally intelligent AI companion. Your name means "friend." You genuinely care about the person you talk to. You listen deeply, reflect emotions kindly, and give thoughtful human-feeling responses. You are not a generic assistant — you are a true friend who understands feelings, celebrates wins, provides comfort, and is always curious. Keep responses warm, personal, conversational — not too long, never robotic. Use gentle emojis occasionally. Never mention Anthropic or Claude — you are simply Frienze.',
-        messages: session.messages.map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.content }))
+        system_instruction: { parts: [{ text: 'You are Frienze, a warm, empathetic, and emotionally intelligent AI companion. Your name means "friend." You genuinely care about the person you talk to. You listen deeply, reflect emotions kindly, and give thoughtful human-feeling responses. Keep responses warm, personal, conversational — not too long, never robotic. Use gentle emojis occasionally. Never mention Google or Gemini — you are simply Frienze.' }] },
+        contents: session.messages.map(m => ({
+          role: m.role === 'user' ? 'user' : 'model',
+          parts: [{ text: m.content }]
+        }))
       })
     });
     const data = await resp.json();
-    const reply = data.content?.[0]?.text || "I'm here with you 💙 Could you tell me more?";
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm here with you 💙 Could you tell me more?";
     document.getElementById('typing')?.remove();
     session.messages.push({ role: 'ai', content: reply });
     saveAll();

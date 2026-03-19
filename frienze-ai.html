@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frienze AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #c8a96e;
+            --gold-dim: rgba(200, 169, 110, 0.2);
+            --bg: #0e0e16;
+            --surface: #141420;
+            --surface2: #1a1a2a;
+            --surface3: #222236;
+            --text: #e8e4dc;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 35% at 50% 0%, rgba(200,169,110,0.07) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        header {
+            font-family: 'Cinzel', serif;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 5px;
+            color: var(--gold);
+            padding: 22px 0 16px;
+            text-transform: uppercase;
+            z-index: 1;
+            text-shadow: 0 0 30px rgba(200,169,110,0.3);
+        }
+
+        .chat-wrapper {
+            width: 90%;
+            max-width: 700px;
+            flex: 1;
+            min-height: 0;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-container {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            padding: 20px;
+            background: var(--surface);
+            border-radius: 14px 14px 0 0;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-bottom: none;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            padding: 13px 17px;
+            border-radius: 12px;
+            max-width: 78%;
+            font-size: 14.5px;
+            line-height: 1.65;
+            word-wrap: break-word;
+            animation: fadeUp 0.22s ease;
+            white-space: pre-wrap;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(7px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .user {
+            background: var(--surface3);
+            align-self: flex-end;
+            border-bottom-right-radius: 3px;
+            color: #ccc;
+        }
+
+        .ai {
+            background: var(--surface2);
+            align-self: flex-start;
+            border: 1px solid var(--gold-dim);
+            border-bottom-left-radius: 3px;
+            color: var(--text);
+        }
+
+        .dots { display: flex; gap: 5px; align-items: center; }
+        .dots span {
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: var(--gold);
+            animation: blink 1.3s infinite ease-in-out;
+        }
+        .dots span:nth-child(2) { animation-delay: 0.18s; }
+        .dots span:nth-child(3) { animation-delay: 0.36s; }
+        @keyframes blink {
+            0%, 80%, 100% { opacity: 0.15; transform: scale(0.75); }
+            40% { opacity: 1; transform: scale(1); }
+        }
+
+        .input-area {
+            width: 90%;
+            max-width: 700px;
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 0 0 14px 14px;
+            z-index: 1;
+            margin-bottom: 14px;
+        }
+
+        #textInput {
+            flex: 1;
+            padding: 11px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.07);
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Lato', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        #textInput:focus { border-color: var(--gold); }
+        #textInput::placeholder { color: #444; }
+
+        button {
+            background: var(--surface2);
+            color: var(--text);
+            border: 1px solid rgba(200,169,110,0.2);
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.2s;
+            font-family: 'Lato', sans-serif;
+        }
+        button:hover:not(:disabled) { background: var(--surface3); border-color: var(--gold); }
+        button:disabled { opacity: 0.4; cursor: not-allowed; }
+        #micBtn.active { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+
+        .status {
+            font-size: 11.5px;
+            color: #555;
+            margin-bottom: 6px;
+            z-index: 1;
+            height: 16px;
+        }
+
+        .chat-container::-webkit-scrollbar { width: 5px; }
+        .chat-container::-webkit-scrollbar-thumb { background: #1d1d2a; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<header>Frienze AI</header>
+
+<div class="chat-wrapper">
+    <div class="chat-container" id="chatContainer">
+        <div class="message ai">Hello! I am Frienze. Ask me anything — I'm here to help.</div>
+    </div>
+    <div class="input-area">
+        <button id="micBtn" onclick="toggleVoice()" title="Voice input">🎤</button>
+        <input
+            id="textInput"
+            type="text"
+            placeholder="Type a message to Frienze..."
+            onkeydown="if(event.key==='Enter' && !isBusy) sendText()"
+            autocomplete="off"
+        />
+        <button id="sendBtn" onclick="sendText()">Send</button>
+    </div>
+</div>
+
+<div class="status" id="statusMsg">Frienze is ready.</div>
+
+<script>
+    // No API key here — it lives safely on the server in server.js
+
+    const chatContainer = document.getElementById("chatContainer");
+    const statusMsg     = document.getElementById("statusMsg");
+    const textInput     = document.getElementById("textInput");
+    const sendBtn       = document.getElementById("sendBtn");
+    const micBtn        = document.getElementById("micBtn");
+
+    let isBusy = false;
+    let isListening = false;
+    let recognition;
+    const conversationHistory = [];
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SR();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = "en-US";
+        recognition.onstart  = () => { isListening = true;  setStatus("Listening..."); micBtn.classList.add("active"); };
+        recognition.onend    = () => { isListening = false; setStatus("Frienze is ready."); micBtn.classList.remove("active"); };
+        recognition.onerror  = (e) => { setStatus("Mic error: " + e.error); isListening = false; micBtn.classList.remove("active"); };
+        recognition.onresult = (event) => { processUserMessage(event.results[0][0].transcript); };
+    }
+
+    function setStatus(text) { statusMsg.textContent = text; }
+    function setBusy(val) { isBusy = val; sendBtn.disabled = val; textInput.disabled = val; }
+
+    function addMessage(content, type, isDots = false) {
+        const msg = document.createElement("div");
+        msg.className = "message " + type;
+        if (isDots) {
+            msg.innerHTML = '<div class="dots"><span></span><span></span><span></span></div>';
+        } else {
+            msg.textContent = content;
+        }
+        chatContainer.appendChild(msg);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        return msg;
+    }
+
+    function sendText() {
+        const message = textInput.value.trim();
+        if (!message || isBusy) return;
+        textInput.value = "";
+        processUserMessage(message);
+    }
+
+    function toggleVoice() {
+        if (!recognition) { alert("Speech recognition not supported in this browser."); return; }
+        if (isListening) recognition.stop();
+        else recognition.start();
+    }
+
+    async function processUserMessage(text) {
+        addMessage(text, "user");
+        conversationHistory.push({ role: "user", content: text });
+        setBusy(true);
+        setStatus("Frienze is thinking...");
+
+        const thinkingEl = addMessage("", "ai", true);
+
+        try {
+            const response = await fetch("/api/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ messages: conversationHistory })
+            });
+
+            const data = await response.json();
+            thinkingEl.remove();
+
+            if (data.reply) {
+                conversationHistory.push({ role: "assistant", content: data.reply });
+                addMessage(data.reply, "ai");
+                setStatus("Frienze is ready.");
+            } else {
+                addMessage("⚠️ " + (data.error || "Unexpected error."), "ai");
+                setStatus("Error occurred.");
+                conversationHistory.pop();
+            }
+        } catch (err) {
+            thinkingEl.remove();
+            addMessage("⚠️ Network error: " + err.message, "ai");
+            setStatus("Connection error.");
+            conversationHistory.pop();
+        }
+
+        setBusy(false);
+    }
+</script>
+</body>
+</html>
